@@ -1,0 +1,7 @@
+/vendor/
+/var/
+tests/_output/
+/.docker/
+/.idea/
+composer.lock
+docker-compose.yml

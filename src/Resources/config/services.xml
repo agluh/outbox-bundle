@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+           https://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <defaults public="false" autoconfigure="false" autowire="false"/>
+
+        <service id="agluh_outbox_bundle.lock_factory" alias="lock.factory"/>
+        <service id="agluh_outbox_bundle.serializer" alias="agluh_outbox_bundle.serializer.default"/>
+
+        <!-- Application -->
+
+        <service id="agluh_outbox_bundle.event_listener.kernel_terminate_event"
+                 class="AGluh\Bundle\OutboxBundle\EventListener\KernelTerminateEventListener">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="agluh_outbox_bundle.lock_factory"/>
+            <argument type="service" id="agluh_outbox_bundle.repository.doctrine"/>
+            <argument type="service" id="agluh_outbox_bundle.serializer"/>
+        </service>
+
+        <service id="agluh_outbox_bundle.event_listener.stop_worker_on_sigterm"
+                 class="AGluh\Bundle\OutboxBundle\EventListener\StopWorkerOnSigtermSignalListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="agluh_outbox_bundle.event_listener.dispatch_pcntl_signal"
+                 class="AGluh\Bundle\OutboxBundle\EventListener\DispatchPcntlSignalListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="agluh_outbox_bundle.event_listener.stop_worker_on_restart"
+                 class="AGluh\Bundle\OutboxBundle\EventListener\StopWorkerOnRestartSignalListener">
+            <argument type="service" id="agluh_outbox_bundle.cache.restart_workers_signal" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+
+            <tag name="monolog.logger" channel="outbox" />
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="agluh_outbox_bundle.serializer.default" class="AGluh\Bundle\OutboxBundle\Serialization\PhpSerializer"/>
+
+        <service id="agluh_outbox_bundle.cache.restart_workers_signal" parent="cache.app">
+            <tag name="cache.pool" />
+        </service>
+
+        <!-- Doctrine -->
+
+        <service id="agluh_outbox_bundle.repository.doctrine"
+                 class="AGluh\Bundle\OutboxBundle\Doctrine\DoctrineOutboxEventRepository">
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            <argument>%agluh_outbox_bundle.outbox_table_name%</argument>
+        </service>
+
+        <service id="agluh_outbox_bundle.event_subscriber.events_collector"
+                 class="AGluh\Bundle\OutboxBundle\Doctrine\EventSubscriber\PersistDomainEventsSubscriber">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="agluh_outbox_bundle.repository.doctrine"/>
+            <argument type="service" id="agluh_outbox_bundle.serializer"/>
+            <tag name="doctrine.event_subscriber" priority="10"/>
+        </service>
+
+        <service id="agluh_outbox_bundle.event_subscriber.table_name_alter"
+                 class="AGluh\Bundle\OutboxBundle\Doctrine\EventSubscriber\MetadataSubscriber">
+            <argument>%agluh_outbox_bundle.outbox_table_name%</argument>
+            <tag name="doctrine.event_subscriber"/>
+        </service>
+
+        <!-- Commands -->
+
+        <service id="agluh_outbox_bundle.command.publish"
+                 class="AGluh\Bundle\OutboxBundle\Command\PublishDomainEventsCommand">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="agluh_outbox_bundle.lock_factory"/>
+            <argument type="service" id="agluh_outbox_bundle.repository.doctrine"/>
+            <argument type="service" id="agluh_outbox_bundle.serializer"/>
+            <argument type="service" id="logger" on-invalid="null" />
+
+            <tag name="console.command" command="outbox:publish" />
+            <tag name="monolog.logger" channel="outbox" />
+        </service>
+
+        <service id="agluh_outbox_bundle.command.stop_workers"
+                 class="AGluh\Bundle\OutboxBundle\Command\StopWorkersCommand">
+            <argument type="service" id="agluh_outbox_bundle.cache.restart_workers_signal"/>
+
+            <tag name="console.command" command="outbox:stop-workers" />
+        </service>
+
+        <service id="agluh_outbox_bundle.command.prune_published"
+                 class="AGluh\Bundle\OutboxBundle\Command\PrunePublishedDomainEventsCommand">
+            <argument type="service" id="agluh_outbox_bundle.repository.doctrine"/>
+            <tag name="console.command"/>
+        </service>
+
+    </services>
+</container>

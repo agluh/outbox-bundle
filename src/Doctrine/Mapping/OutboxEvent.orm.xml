@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                  http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="AGluh\Bundle\OutboxBundle\Domain\Model\OutboxEvent" table="outbox" change-tracking-policy="DEFERRED_EXPLICIT">
+        <id name="id" type="uuid_binary"/>
+        <field name="eventData" type="text"/>
+        <field name="registeredAt" type="datetime_immutable_microseconds"/>
+        <field name="toBePublishedAt" type="datetime_immutable_microseconds"/>
+        <field name="publishedAt" type="datetime_immutable_microseconds" nullable="true"/>
+    </entity>
+</doctrine-mapping>
