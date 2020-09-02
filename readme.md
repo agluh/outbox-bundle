@@ -88,6 +88,10 @@ class OutboxIntegrationEventsListener implements EventSubscriberInterface
              * that returns array of domain events for aggregate.
              */
             foreach ($aggregateRoot->popEvents() as $domainEvent) {
+                /**
+                 * Basically domain event can be any PHP type that supports serialization.
+                 * See Serialization section below in docs.
+                 */
                 $event->addDomainEvent($domainEvent);
             }
         }
@@ -103,8 +107,6 @@ class OutboxIntegrationEventsListener implements EventSubscriberInterface
         
         /**
          * Here DomainEvent is an interface or base class for your domain event.
-         * Basically domain event can be any PHP type that supports serialization.
-         * See Serialization section below in docs.
          */
         if($domainEvent instanceof DomainEvent) {
             
@@ -118,7 +120,7 @@ class OutboxIntegrationEventsListener implements EventSubscriberInterface
     /**
      * This function will be called by outbox bundle for each domain event should be published.
      */
-    public function onOutboxEventEnqueuedForPublishing(DomainEventEnqueuedForPublishingEvent $event): void
+    public function onDomainEventEnqueuedForPublishing(DomainEventEnqueuedForPublishingEvent $event): void
     {
         // It makes sense to stop propagation for event
         $event->stopPropagation();
@@ -144,7 +146,7 @@ class OutboxIntegrationEventsListener implements EventSubscriberInterface
         return [
             AggregateRootPreparedForPersistenceEvent::class => 'onAggregateRootPreparedForPersistence',
             DomainEventPreparedForPersistenceEvent::class => 'onDomainEventPreparedForPersistence',
-            DomainEventEnqueuedForPublishingEvent::class => 'onOutboxEventEnqueuedForPublishing',
+            DomainEventEnqueuedForPublishingEvent::class => 'onDomainEventEnqueuedForPublishing',
             DomainEventPublishedEvent::class => 'onDomainEventPublished'
         ];
     }
