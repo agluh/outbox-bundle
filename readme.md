@@ -240,8 +240,8 @@ Then register new serializer as a service.
 ```yaml
 # config\services.yaml
 services:
-    App\Service\CustomSerializer:
-        alias: agluh_outbox_bundle.serializer
+    agluh_outbox_bundle.serializer:
+        class: App\Service\CustomSerializer
 
 ```
 
