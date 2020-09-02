@@ -1,7 +1,8 @@
 /vendor/
 /var/
-tests/_output/
+/tests/_output/
 /.docker/
 /.idea/
+phpunit.xml
 composer.lock
 docker-compose.yml

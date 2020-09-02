@@ -16,16 +16,24 @@
     "require-dev": {
         "roave/security-advisories": "dev-master",
         "phpstan/phpstan": "^0.12.40",
-        "symplify/easy-coding-standard": "^8.1"
+        "symplify/easy-coding-standard": "^8.1",
+        "symfony/phpunit-bridge": "^5.1"
     },
     "autoload": {
         "psr-4": {
           "AGluh\\Bundle\\OutboxBundle\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "AGluh\\Bundle\\OutboxBundle\\Tests\\": "tests/"
+        }
+    },
     "scripts": {
         "static": "vendor/bin/phpstan analyze --ansi",
         "cs": "vendor/bin/ecs check --ansi --config=ecs.php",
-        "cs-fix": "vendor/bin/ecs check --ansi --config=ecs.php --fix"
+        "cs-fix": "vendor/bin/ecs check --ansi --config=ecs.php --fix",
+        "test": "vendor/bin/simple-phpunit",
+        "test-coverage": "vendor/bin/simple-phpunit --coverage-html tests/_output/coverage"
     }
 }
