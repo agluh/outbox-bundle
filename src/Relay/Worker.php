@@ -23,7 +23,7 @@ class Worker
     private LockFactory $lockFactory;
     private OutboxEventRepository $repository;
     private SerializerInterface $serializer;
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger;
     private bool $shouldStop = false;
 
     public function __construct(
@@ -31,7 +31,7 @@ class Worker
         LockFactory $lockFactory,
         OutboxEventRepository $repository,
         SerializerInterface $serializer,
-        LoggerInterface $logger
+        ?LoggerInterface $logger = null
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->lockFactory = $lockFactory;
@@ -104,7 +104,7 @@ class Worker
             } finally {
                 $lock->release();
             }
-        } else {
+        } elseif (null !== $this->logger) {
             $this->logger->info('Another worker is in process of events publishing, skip the job.');
         }
 

@@ -13,10 +13,10 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
     public const RESTART_REQUESTED_TIMESTAMP_KEY = 'workers.restart_requested_timestamp';
 
     private CacheItemPoolInterface $cachePool;
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger;
     private float $workerStartedAt = 0;
 
-    public function __construct(CacheItemPoolInterface $cachePool, LoggerInterface $logger)
+    public function __construct(CacheItemPoolInterface $cachePool, ?LoggerInterface $logger = null)
     {
         $this->cachePool = $cachePool;
         $this->logger = $logger;
@@ -32,12 +32,15 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
         if ($this->shouldRestart()) {
             $event->worker()->stop();
 
-            $this->logger->info('Worker stopped because a restart was requested.');
+            if (null !== $this->logger) {
+                $this->logger->info('Worker stopped because a restart was requested.');
+            }
         }
     }
 
     /**
-     * @return string[]
+     * @return array<mixed>
+     * @codeCoverageIgnore
      */
     public static function getSubscribedEvents(): array
     {

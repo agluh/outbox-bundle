@@ -8,7 +8,6 @@ use AGluh\Bundle\OutboxBundle\Domain\Model\OutboxEventRepository;
 use AGluh\Bundle\OutboxBundle\Relay\Worker;
 use AGluh\Bundle\OutboxBundle\Serialization\SerializerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -23,7 +22,7 @@ class KernelTerminateEventListener implements EventSubscriberInterface
     private LockFactory $lockFactory;
     private OutboxEventRepository $repository;
     private SerializerInterface $serializer;
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -36,18 +35,7 @@ class KernelTerminateEventListener implements EventSubscriberInterface
         $this->lockFactory = $lockFactory;
         $this->repository = $repository;
         $this->serializer = $serializer;
-        $this->logger = $logger ?? new NullLogger();
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::TERMINATE => 'onTerminateEvent',
-            ConsoleEvents::TERMINATE => 'onConsoleTerminateEvent',
-        ];
+        $this->logger = $logger;
     }
 
     public function onTerminateEvent(TerminateEvent $event): void
@@ -64,5 +52,17 @@ class KernelTerminateEventListener implements EventSubscriberInterface
     {
         $worker = new Worker($this->eventDispatcher, $this->lockFactory, $this->repository, $this->serializer, $this->logger);
         $worker->run();
+    }
+
+    /**
+     * @return array<mixed>
+     * @codeCoverageIgnore
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::TERMINATE => 'onTerminateEvent',
+            ConsoleEvents::TERMINATE => 'onConsoleTerminateEvent',
+        ];
     }
 }

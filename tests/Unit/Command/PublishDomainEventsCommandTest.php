@@ -33,4 +33,38 @@ class PublishDomainEventsCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute([]);
     }
+
+    /**
+     * @dataProvider getBytesConversionTestData
+     */
+    public function test_bytes_conversion(string $limit, int $bytes): void
+    {
+        $command = (new \ReflectionClass(PublishDomainEventsCommand::class))->newInstanceWithoutConstructor();
+        $method = new \ReflectionMethod(PublishDomainEventsCommand::class, 'convertToBytes');
+        $method->setAccessible(true);
+        self::assertEquals($bytes, $method->invoke($command, $limit));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getBytesConversionTestData(): array
+    {
+        return [
+            ['2k', 2048],
+            ['2 k', 2048],
+            ['8m', 8 * 1024 * 1024],
+            ['+2 k', 2048],
+            ['+2???k', 2048],
+            ['0x10', 16],
+            ['0xf', 15],
+            ['010', 8],
+            ['+0x10 k', 16 * 1024],
+            ['1g', 1024 * 1024 * 1024],
+            ['1G', 1024 * 1024 * 1024],
+            ['-1', -1],
+            ['0', 0],
+            ['2mk', 2048], // the unit must be the last char, so in this case 'k', not 'm'
+        ];
+    }
 }

@@ -11,10 +11,10 @@ use Webmozart\Assert\Assert;
 class StopWorkerOnTimeLimitListener implements EventSubscriberInterface
 {
     private int $timeLimitInSeconds;
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger;
     private float $endTime = 0;
 
-    public function __construct(int $timeLimitInSeconds, LoggerInterface $logger)
+    public function __construct(int $timeLimitInSeconds, ?LoggerInterface $logger = null)
     {
         Assert::greaterThan($timeLimitInSeconds, 0, 'Time limit must be greater than zero.');
 
@@ -33,13 +33,16 @@ class StopWorkerOnTimeLimitListener implements EventSubscriberInterface
         if ($this->endTime < microtime(true)) {
             $event->worker()->stop();
 
-            $this->logger->info('Worker stopped due to time limit of {timeLimit}s exceeded',
-                ['timeLimit' => $this->timeLimitInSeconds]);
+            if (null !== $this->logger) {
+                $this->logger->info('Worker stopped due to time limit of {timeLimit}s exceeded',
+                    ['timeLimit' => $this->timeLimitInSeconds]);
+            }
         }
     }
 
     /**
-     * @return string[]
+     * @return array<mixed>
+     * @codeCoverageIgnore
      */
     public static function getSubscribedEvents(): array
     {

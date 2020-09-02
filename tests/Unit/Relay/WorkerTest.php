@@ -150,9 +150,9 @@ class WorkerTest extends TestCase
 
         $duration = microtime(true) - $startTime;
         // wait time should be .3 seconds
-        // use .29 & .31 for timing "wiggle room"
-        self::assertGreaterThanOrEqual(.29, $duration);
-        self::assertLessThan(.31, $duration);
+        // use .28 & .32 for timing "wiggle room"
+        self::assertGreaterThanOrEqual(.28, $duration);
+        self::assertLessThan(.32, $duration);
     }
 
     public function test_worker_skip_job_if_lock_is_not_acquired(): void

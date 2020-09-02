@@ -13,7 +13,8 @@ class DispatchPcntlSignalListener implements EventSubscriberInterface
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
+     * @codeCoverageIgnore
      */
     public static function getSubscribedEvents(): array
     {

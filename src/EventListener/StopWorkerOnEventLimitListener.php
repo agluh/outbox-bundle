@@ -10,10 +10,10 @@ use Webmozart\Assert\Assert;
 class StopWorkerOnEventLimitListener implements EventSubscriberInterface
 {
     private int $maximumNumberOfEvents;
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger;
     private int $publishedEvents = 0;
 
-    public function __construct(int $maximumNumberOfEvents, LoggerInterface $logger)
+    public function __construct(int $maximumNumberOfEvents, ?LoggerInterface $logger = null)
     {
         Assert::greaterThan($maximumNumberOfEvents, 0, 'Event limit must be greater than zero.');
 
@@ -27,13 +27,16 @@ class StopWorkerOnEventLimitListener implements EventSubscriberInterface
             $this->publishedEvents = 0;
             $event->worker()->stop();
 
-            $this->logger->info('Worker stopped due to maximum count of {count} events published',
-                ['count' => $this->maximumNumberOfEvents]);
+            if (null !== $this->logger) {
+                $this->logger->info('Worker stopped due to maximum count of {count} events published',
+                    ['count' => $this->maximumNumberOfEvents]);
+            }
         }
     }
 
     /**
-     * @return string[]
+     * @return array<mixed>
+     * @codeCoverageIgnore
      */
     public static function getSubscribedEvents(): array
     {
