@@ -8,7 +8,10 @@ use AGluh\Bundle\OutboxBundle\Exception\DomainEventDecodingFailedException;
 
 class PhpSerializer implements SerializerInterface
 {
-    public function encode(object $domainEvent): string
+    /**
+     * @param mixed $domainEvent
+     */
+    public function encode($domainEvent): string
     {
         return addslashes(serialize($domainEvent));
     }
