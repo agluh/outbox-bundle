@@ -34,7 +34,7 @@
             <argument type="service" id="agluh_outbox_bundle.cache.restart_workers_signal" />
             <argument type="service" id="logger" on-invalid="ignore" />
 
-            <tag name="monolog.logger" channel="outbox" />
+            <tag name="monolog.logger" channel="outbox"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

@@ -59,6 +59,9 @@ class Worker
 
                 if (false === $isEventsPublished) {
                     $this->eventDispatcher->dispatch(new WorkerRunningEvent($this, true));
+                }
+
+                if (false === $this->shouldStop) {
                     usleep($options['sleep']);
                 }
             }

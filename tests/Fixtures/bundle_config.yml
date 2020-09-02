@@ -1,0 +1,3 @@
+agluh_outbox:
+    table_name: test
+    auto_publish: true
