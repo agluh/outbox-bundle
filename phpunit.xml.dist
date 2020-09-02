@@ -3,7 +3,7 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="./vendor/autoload.php"
+         bootstrap="./tests/bootstrap.php"
          cacheResultFile="var/cache/.phpunit.results.cache"
 >
     <php>
@@ -24,4 +24,12 @@
             <directory>./src</directory>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="\Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+    </listeners>
+
+    <extensions>
+        <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+    </extensions>
 </phpunit>

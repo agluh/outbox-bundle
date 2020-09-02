@@ -3,9 +3,12 @@ doctrine:
         default_connection: default
         connections:
             default:
-                url: 'sqlite:///:memory:'
+                url: '%env(resolve:DATABASE_URL)%'
                 profiling: true
-                charset: UTF8
+                charset: utf8mb4
+                default_table_options:
+                    charset: utf8mb4
+                    collate: utf8mb4_unicode_ci
 
     orm:
         default_entity_manager: default
@@ -13,6 +16,12 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
 
+dama_doctrine_test:
+    enable_static_connection: true
+    enable_static_meta_data_cache: true
+    enable_static_query_cache: true
+
 framework:
     router:
-        utf8:
+        utf8: true
+        resource:

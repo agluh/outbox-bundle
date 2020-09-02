@@ -3,6 +3,9 @@
 /tests/_output/
 /.docker/
 /.idea/
-phpunit.xml
-composer.lock
-docker-compose.yml
+/.env.local
+/.env.local.php
+/.env.*.local
+/phpunit.xml
+/composer.lock
+/docker-compose.yml
