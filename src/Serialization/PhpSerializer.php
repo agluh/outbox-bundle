@@ -13,7 +13,12 @@ class PhpSerializer implements SerializerInterface
         return addslashes(serialize($domainEvent));
     }
 
-    public function decode(string $data): object
+    /**
+     * @param string $data
+     *
+     * @return mixed
+     */
+    public function decode(string $data)
     {
         $signalingException = new DomainEventDecodingFailedException(sprintf('Could not decode message using PHP serialization: %s.', $data));
         $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');

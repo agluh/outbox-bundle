@@ -11,7 +11,9 @@ interface SerializerInterface
     public function encode(object $domainEvent): string;
 
     /**
+     * @return mixed
+     *
      * @throws DomainEventDecodingFailedException
      */
-    public function decode(string $data): object;
+    public function decode(string $data);
 }

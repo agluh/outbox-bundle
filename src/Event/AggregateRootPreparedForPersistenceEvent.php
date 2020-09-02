@@ -10,7 +10,7 @@ final class AggregateRootPreparedForPersistenceEvent extends Event
 {
     private object $aggregateRoot;
 
-    /** @var array<object> */
+    /** @var array<mixed> */
     private array $domainEvents = [];
 
     public function __construct(object $aggregateRoot)
@@ -24,14 +24,17 @@ final class AggregateRootPreparedForPersistenceEvent extends Event
     }
 
     /**
-     * @return array<object>
+     * @return mixed[]
      */
     public function collectedDomainEvents(): array
     {
         return $this->domainEvents;
     }
 
-    public function addDomainEvent(object $domainEvent): void
+    /**
+     * @param mixed $domainEvent
+     */
+    public function addDomainEvent($domainEvent): void
     {
         $this->domainEvents[] = $domainEvent;
     }

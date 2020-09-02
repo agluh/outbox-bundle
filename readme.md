@@ -103,6 +103,8 @@ class OutboxIntegrationEventsListener implements EventSubscriberInterface
         
         /**
          * Here DomainEvent is an interface or base class for your domain event.
+         * Basically domain event can be any PHP type that supports serialization.
+         * See Serialization section below in docs.
          */
         if($domainEvent instanceof DomainEvent) {
             
@@ -114,7 +116,7 @@ class OutboxIntegrationEventsListener implements EventSubscriberInterface
     }
     
     /**
-     * This function will be called by Outbox bundle for each domain event should be published.
+     * This function will be called by outbox bundle for each domain event should be published.
      */
     public function onOutboxEventEnqueuedForPublishing(DomainEventEnqueuedForPublishingEvent $event): void
     {
@@ -123,20 +125,19 @@ class OutboxIntegrationEventsListener implements EventSubscriberInterface
 
         $domainEvent = $event->domainEvent();
 
-        // Do whatever you mention under 'publish event' here. For example, send to RabbitMQ.
+        // Do whatever you mention under 'publish event' here. For example, send message to RabbitMQ.
         
-        // You must set publication date here to mark event as published in outbox.
+        // You MUST set publication date here to mark event as published in outbox table.
         $event->setPublicationDate(new \DateTimeImmutable());
     }
     
     /**
-     * This function will be called after outbox persists domain event as published.
+     * This function will be called after outbox bundle persists domain event as published.
      */
     public function onDomainEventPublished(DomainEventPublishedEvent $event): void
     {
         // Do something if you want
     }
-
 
     public static function getSubscribedEvents(): array
     {
@@ -176,7 +177,7 @@ Options:
 
 The php process is not designed to work for a long time. So it has to quit periodically. Or, the command may exit because of error or exception. Something has to bring it back and continue events publication (if not used auto publication). You can use Supervisord for that. It starts processes and keep an eye on them while they are working.
 
-Here an example of supervisord configuration. It runs four instances of outbox:publish command.
+Here an example of supervisord configuration. It runs an instance of outbox:publish command.
 
 ```ini
 [program:outbox_worker]
@@ -199,6 +200,49 @@ outbox:prune-published
 #### Stop workers
 ```bash
 outbox:stop-workers
+```
+
+### Custom serializer
+
+By default, outbox bundle uses serialize/unserialize functions from PHP to convert storable domain event to a string.
+You can use custom serializer for that purpose. For example, how to use symfony/serializer is shown below.
+
+```php
+namespace App\Service;
+
+use AGluh\Bundle\OutboxBundle\Serialization\SerializerInterface;
+use AGluh\Bundle\OutboxBundle\Exception\DomainEventDecodingFailedException;
+
+class CustomSerializer implements SerializerInterface
+{
+    private \Symfony\Component\Serializer\SerializerInterface $serializer;
+    
+    // Constructor skipped
+
+    public function encode($domainEvent): string
+    {
+        return $this->serializer->serialize($domainEvent, 'json');
+    }
+    
+    /**
+     * @throws DomainEventDecodingFailedException
+     */
+    public function decode(string $data)
+    {
+        // In this example we don't convert json back to an object and simply use it further
+        return $data;
+    }
+}
+```
+
+Then register new serializer as a service.
+
+```yaml
+# config\services.yaml
+services:
+    App\Service\CustomSerializer:
+        alias: agluh_outbox_bundle.serializer
+
 ```
 
 ### Default configuration

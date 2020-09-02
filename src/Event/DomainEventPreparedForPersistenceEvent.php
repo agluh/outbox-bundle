@@ -9,16 +9,24 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class DomainEventPreparedForPersistenceEvent extends Event
 {
-    private object $domainEvent;
+    /** @var mixed */
+    private $domainEvent;
     private DateTimeImmutable $toBePublishedAt;
 
-    public function __construct(object $domainEvent, DateTimeImmutable $registrationDate)
+    /**
+     * @param mixed             $domainEvent
+     * @param DateTimeImmutable $registrationDate
+     */
+    public function __construct($domainEvent, DateTimeImmutable $registrationDate)
     {
         $this->domainEvent = $domainEvent;
         $this->toBePublishedAt = $registrationDate;
     }
 
-    public function domainEvent(): object
+    /**
+     * @return mixed
+     */
+    public function domainEvent()
     {
         return $this->domainEvent;
     }

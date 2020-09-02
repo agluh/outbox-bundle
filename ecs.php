@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use PhpCsFixer\Fixer\Phpdoc\NoSuperfluousPhpdocTagsFixer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symplify\EasyCodingStandard\Configuration\Option;
 use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
@@ -19,6 +20,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         SetList::STRICT,
         SetList::PSR_12,
         SetList::SYMFONY,
+    ]);
+
+    $parameters->set(Option::SKIP, [
+        NoSuperfluousPhpdocTagsFixer::class => null
     ]);
 
     $parameters->set(Option::EXCLUDE_PATHS, [

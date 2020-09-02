@@ -10,12 +10,20 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class DomainEventPublishedEvent extends Event
 {
     private string $eventId;
-    private object $domainEvent;
+    /** @var mixed */
+    private $domainEvent;
     private DateTimeImmutable $registeredAt;
     private DateTimeImmutable $toBePublishedAt;
     private DateTimeImmutable $publishedAt;
 
-    public function __construct(string $eventId, object $domainEvent,
+    /**
+     * @param string            $eventId
+     * @param mixed             $domainEvent
+     * @param DateTimeImmutable $registeredAt
+     * @param DateTimeImmutable $toBePublishedAt
+     * @param DateTimeImmutable $publishedAt
+     */
+    public function __construct(string $eventId, $domainEvent,
                                 DateTimeImmutable $registeredAt, DateTimeImmutable $toBePublishedAt,
                                 DateTimeImmutable $publishedAt)
     {
@@ -31,7 +39,10 @@ final class DomainEventPublishedEvent extends Event
         return $this->eventId;
     }
 
-    public function domainEvent(): object
+    /**
+     * @return mixed
+     */
+    public function domainEvent()
     {
         return $this->domainEvent;
     }
