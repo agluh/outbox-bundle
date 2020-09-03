@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace AGluh\Bundle\OutboxBundle\Doctrine\EventSubscriber;
+namespace AGluh\Bundle\OutboxBundle\Doctrine\EventListener;
 
 use AGluh\Bundle\OutboxBundle\Domain\Model\OutboxEvent;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 
-class MetadataSubscriber implements EventSubscriber
+class ClassMetadataListener implements EventSubscriber
 {
     private string $tableName;
 

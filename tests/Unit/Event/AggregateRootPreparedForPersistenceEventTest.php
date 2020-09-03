@@ -18,7 +18,7 @@ class AggregateRootPreparedForPersistenceEventTest extends TestCase
         self::assertCount(0, $eventListener->collectedDomainEvents());
     }
 
-    public function test__collected_domain_events_getter_returns_correct_value(): void
+    public function test_collected_domain_events_getter_returns_correct_value(): void
     {
         $aggregate = new \stdClass();
         $eventListener = new AggregateRootPreparedForPersistenceEvent($aggregate);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AGluh\Bundle\OutboxBundle\Doctrine\EventSubscriber;
+namespace AGluh\Bundle\OutboxBundle\Doctrine\EventListener;
 
 use AGluh\Bundle\OutboxBundle\Domain\Model\OutboxEvent;
 use AGluh\Bundle\OutboxBundle\Domain\Model\OutboxEventRepository;
@@ -16,7 +16,7 @@ use Doctrine\ORM\Events;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PersistDomainEventsSubscriber implements EventSubscriber
+class PersistDomainEventsListener implements EventSubscriber
 {
     private EventDispatcherInterface $eventDispatcher;
     private OutboxEventRepository $eventsRepository;
@@ -55,35 +55,50 @@ class PersistDomainEventsSubscriber implements EventSubscriber
             $uow->getScheduledEntityInsertions(),
             $uow->getScheduledEntityUpdates(),
             $uow->getScheduledEntityDeletions(),
-            //$uow->getScheduledCollectionDeletions(),
-            //$uow->getScheduledCollectionUpdates()
+
+            // TODO: what about collections?
+            // $uow->getScheduledCollectionDeletions(),
+            // $uow->getScheduledCollectionUpdates()
         ];
 
         foreach ($sources as $source) {
             foreach ($source as $entity) {
-                $aggregatePreparedEvent = new AggregateRootPreparedForPersistenceEvent($entity);
-
-                $this->eventDispatcher->dispatch($aggregatePreparedEvent);
-
-                foreach ($aggregatePreparedEvent->collectedDomainEvents() as $domainEvent) {
-                    $eventPreparedEvent = new DomainEventPreparedForPersistenceEvent(
-                        $domainEvent,
-                        $this->getDate()
-                    );
-
-                    $this->eventDispatcher->dispatch($eventPreparedEvent);
-
-                    $outboxEvent = new OutboxEvent(
-                        Uuid::uuid4(),
-                        $this->serializer->encode($domainEvent),
-                        $this->getDate(),
-                        $eventPreparedEvent->expectedPublicationDate()
-                    );
-
-                    $this->eventsRepository->append($outboxEvent);
-                }
+                $this->collectDomainEvents($entity);
             }
         }
+    }
+
+    private function collectDomainEvents(object $entity): void
+    {
+        $aggregatePreparedEvent = new AggregateRootPreparedForPersistenceEvent($entity);
+
+        $this->eventDispatcher->dispatch($aggregatePreparedEvent);
+
+        foreach ($aggregatePreparedEvent->collectedDomainEvents() as $domainEvent) {
+            $this->persistDomainEvent($domainEvent);
+        }
+    }
+
+    /**
+     * @param mixed $domainEvent
+     */
+    private function persistDomainEvent($domainEvent): void
+    {
+        $eventPreparedEvent = new DomainEventPreparedForPersistenceEvent(
+            $domainEvent,
+            $this->getDate()
+        );
+
+        $this->eventDispatcher->dispatch($eventPreparedEvent);
+
+        $outboxEvent = new OutboxEvent(
+            Uuid::uuid4(),
+            $this->serializer->encode($domainEvent),
+            $this->getDate(),
+            $eventPreparedEvent->expectedPublicationDate()
+        );
+
+        $this->eventsRepository->append($outboxEvent);
     }
 
     protected function getDate(string $time = 'now'): DateTimeImmutable

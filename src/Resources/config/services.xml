@@ -17,6 +17,7 @@
             <argument type="service" id="agluh_outbox_bundle.lock_factory"/>
             <argument type="service" id="agluh_outbox_bundle.repository.doctrine"/>
             <argument type="service" id="agluh_outbox_bundle.serializer"/>
+            <!-- will be tagged dynamically in Extension -->
         </service>
 
         <service id="agluh_outbox_bundle.event_listener.stop_worker_on_sigterm"
@@ -52,16 +53,16 @@
             <argument>%agluh_outbox_bundle.outbox_table_name%</argument>
         </service>
 
-        <service id="agluh_outbox_bundle.event_subscriber.events_collector"
-                 class="AGluh\Bundle\OutboxBundle\Doctrine\EventSubscriber\PersistDomainEventsSubscriber">
+        <service id="agluh_outbox_bundle.event_listener.events_collector"
+                 class="AGluh\Bundle\OutboxBundle\Doctrine\EventListener\PersistDomainEventsListener">
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="agluh_outbox_bundle.repository.doctrine"/>
             <argument type="service" id="agluh_outbox_bundle.serializer"/>
             <tag name="doctrine.event_subscriber" priority="10"/>
         </service>
 
-        <service id="agluh_outbox_bundle.event_subscriber.table_name_alter"
-                 class="AGluh\Bundle\OutboxBundle\Doctrine\EventSubscriber\MetadataSubscriber">
+        <service id="agluh_outbox_bundle.event_listener.table_name_alter"
+                 class="AGluh\Bundle\OutboxBundle\Doctrine\EventListener\ClassMetadataListener">
             <argument>%agluh_outbox_bundle.outbox_table_name%</argument>
             <tag name="doctrine.event_subscriber"/>
         </service>
@@ -90,7 +91,7 @@
         <service id="agluh_outbox_bundle.command.prune_published"
                  class="AGluh\Bundle\OutboxBundle\Command\PrunePublishedDomainEventsCommand">
             <argument type="service" id="agluh_outbox_bundle.repository.doctrine"/>
-            <tag name="console.command"/>
+            <tag name="console.command" command="outbox:prune-published" />
         </service>
 
     </services>

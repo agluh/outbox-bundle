@@ -14,66 +14,49 @@ class DomainEventEnqueuedForPublishingEventTest extends TestCase
     private const EXPECTED_PUBLICATION_DATE = '2020-09-03 10:00:00.000002';
     private const PUBLICATION_DATE = '2020-09-03 10:00:00.000003';
 
+    private object $domainEvent;
+    private \DateTimeImmutable $registeredAt;
+    private \DateTimeImmutable $toBePublishedAt;
+    private DomainEventEnqueuedForPublishingEvent $eventListener;
+
+    public function setUp(): void
+    {
+        $this->domainEvent = new \stdClass();
+        $this->registeredAt = new \DateTimeImmutable(self::REGISTRATION_DATE);
+        $this->toBePublishedAt = new \DateTimeImmutable(self::EXPECTED_PUBLICATION_DATE);
+        $this->eventListener = new DomainEventEnqueuedForPublishingEvent(self::EVENT_ID, $this->domainEvent, $this->registeredAt, $this->toBePublishedAt);
+    }
+
     public function test_event_id_getter_returns_correct_value(): void
     {
-        $domainEvent = new \stdClass();
-        $registeredAt = new \DateTimeImmutable(self::REGISTRATION_DATE);
-        $toBePublishedAt = new \DateTimeImmutable(self::EXPECTED_PUBLICATION_DATE);
-        $eventListener = new DomainEventEnqueuedForPublishingEvent(self::EVENT_ID, $domainEvent, $registeredAt, $toBePublishedAt);
-
-        self::assertEquals(self::EVENT_ID, $eventListener->eventId());
+        self::assertEquals(self::EVENT_ID, $this->eventListener->eventId());
     }
 
     public function test_domain_event_getter_returns_correct_value(): void
     {
-        $domainEvent = new \stdClass();
-        $registeredAt = new \DateTimeImmutable(self::REGISTRATION_DATE);
-        $toBePublishedAt = new \DateTimeImmutable(self::EXPECTED_PUBLICATION_DATE);
-        $eventListener = new DomainEventEnqueuedForPublishingEvent(self::EVENT_ID, $domainEvent, $registeredAt, $toBePublishedAt);
-
-        self::assertSame($domainEvent, $eventListener->domainEvent());
+        self::assertSame($this->domainEvent, $this->eventListener->domainEvent());
     }
 
     public function test_registration_date_getter_returns_correct_value(): void
     {
-        $domainEvent = new \stdClass();
-        $registeredAt = new \DateTimeImmutable(self::REGISTRATION_DATE);
-        $toBePublishedAt = new \DateTimeImmutable(self::EXPECTED_PUBLICATION_DATE);
-        $eventListener = new DomainEventEnqueuedForPublishingEvent(self::EVENT_ID, $domainEvent, $registeredAt, $toBePublishedAt);
-
-        self::assertEquals($registeredAt, $eventListener->registrationDate());
+        self::assertEquals($this->registeredAt, $this->eventListener->registrationDate());
     }
 
     public function test_expected_publication_date_getter_returns_correct_value(): void
     {
-        $domainEvent = new \stdClass();
-        $registeredAt = new \DateTimeImmutable(self::REGISTRATION_DATE);
-        $toBePublishedAt = new \DateTimeImmutable(self::EXPECTED_PUBLICATION_DATE);
-        $eventListener = new DomainEventEnqueuedForPublishingEvent(self::EVENT_ID, $domainEvent, $registeredAt, $toBePublishedAt);
-
-        self::assertEquals($toBePublishedAt, $eventListener->expectedPublicationDate());
+        self::assertEquals($this->toBePublishedAt, $this->eventListener->expectedPublicationDate());
     }
 
     public function test_publication_date_getter_returns_correct_value(): void
     {
-        $domainEvent = new \stdClass();
-        $registeredAt = new \DateTimeImmutable(self::REGISTRATION_DATE);
-        $toBePublishedAt = new \DateTimeImmutable(self::EXPECTED_PUBLICATION_DATE);
-        $eventListener = new DomainEventEnqueuedForPublishingEvent(self::EVENT_ID, $domainEvent, $registeredAt, $toBePublishedAt);
-
-        self::assertNull($eventListener->publicationDate());
+        self::assertNull($this->eventListener->publicationDate());
     }
 
     public function test_publication_date_setter(): void
     {
-        $domainEvent = new \stdClass();
-        $registeredAt = new \DateTimeImmutable(self::REGISTRATION_DATE);
-        $toBePublishedAt = new \DateTimeImmutable(self::EXPECTED_PUBLICATION_DATE);
-        $eventListener = new DomainEventEnqueuedForPublishingEvent(self::EVENT_ID, $domainEvent, $registeredAt, $toBePublishedAt);
-
         $publishedAt = new \DateTimeImmutable(self::PUBLICATION_DATE);
-        $eventListener->setPublicationDate($publishedAt);
+        $this->eventListener->setPublicationDate($publishedAt);
 
-        self::assertEquals($publishedAt, $eventListener->publicationDate());
+        self::assertEquals($publishedAt, $this->eventListener->publicationDate());
     }
 }
