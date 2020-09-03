@@ -17,12 +17,12 @@
         "roave/security-advisories": "dev-master",
         "phpstan/phpstan": "^0.12.40",
         "symplify/easy-coding-standard": "^8.1",
-        "symfony/phpunit-bridge": "^5.1",
+        "symfony/phpunit-bridge": "^4.4 || ^5.0",
         "matthiasnoback/symfony-dependency-injection-test": "^4.1",
         "nyholm/symfony-bundle-test": "^1.6",
         "dama/doctrine-test-bundle": "^6.3",
         "doctrine/doctrine-fixtures-bundle": "^3.3",
-        "symfony/dotenv": "^5.1"
+        "symfony/dotenv": "^4.4 || ^5.0"
     },
     "autoload": {
         "psr-4": {
