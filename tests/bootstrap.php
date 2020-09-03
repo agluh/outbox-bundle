@@ -11,7 +11,9 @@ use Symfony\Component\Dotenv\Dotenv;
 
 function bootstrap(): void
 {
-    (new Dotenv())->load(dirname(__DIR__).'/.env.test.local');
+    if(file_exists(dirname(__DIR__).'/.env.test.local')) {
+        (new Dotenv())->load(dirname(__DIR__).'/.env.test.local');
+    }
 
     $kernel = new AppKernel('test', true);
     $kernel->boot();

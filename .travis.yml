@@ -30,7 +30,6 @@ before_install:
     - composer self-update
 
 install:
-    - composer require symfony/flex --no-update
     - composer install --prefer-source
     - vendor/bin/simple-phpunit install
 

@@ -8,17 +8,18 @@ Implements [Outbox pattern](https://microservices.io/patterns/data/transactional
     2. If bundle configured with `auto_publish=false` option, then you should use CLI interface described below to periodically run worker for publishing of stored events.
 
 **Important note:** events are published on-by-one in order they are stored in outbox table during aggregate persistence. 
-If for some reason during DomainEventEnqueuedForPublishingEvent handler domain event is not marked as published (i.e. publication date not set)
+If for some reason on _DomainEventEnqueuedForPublishingEvent_ handler domain event is not marked as published (i.e. publication date not set)
 then next time outbox will try to publish *the same domain event* until it succeeded. This ensures time consistency of published domain events.
 
 **Note:** you can combine auto publishing with CLI-based publication at the same time. Locking mechanism ensure all events will be published in order they came to outbox table.
+
 ### Acknowledgments
 Inspired by [Domain Event Bundle](https://github.com/headsnet/domain-events-bundle).
 Worker class manly based on Worker from symfony/messenger component.
 
 ### Installation
 
-_Requires Symfony 4.4, or Symfony 5.x_
+_Requires Symfony 4.4, or Symfony 5.x and PHP 7.4 and above_
 
 Make sure Composer is installed globally, as explained in the
 [installation chapter](https://getcomposer.org/doc/00-intro.md)
