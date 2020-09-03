@@ -1,7 +1,7 @@
 # Outbox bundle
 Implements [Outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) for DDD-based Symfony applications.
 
-## How it works:
+### How it works:
 1. We collect domain events from aggregate being persisted and save them in a separate table within a single database transaction.
 2. After a successful commit we perform publication for stored domain events.
     1. If bundle configured with `auto_publish=true` option, then domain events from outbox table are published using a Symfony event listener in the kernel.TERMINATE or console.TERMINATE events.
