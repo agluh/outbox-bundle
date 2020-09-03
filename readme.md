@@ -184,7 +184,7 @@ Here an example of supervisord configuration.
 
 ```ini
 [program:outbox_worker]
-command=/path/to/bin/console --env=prod --no-debug --time-limit=3600 outbox:publish
+command=/path/to/bin/console outbox:publish --env=prod --no-debug --time-limit=3600 --daemonize
 process_name=%(program_name)s_%(process_num)02d
 numprocs=1 # There is no reason to use multiple workers here because of locking nature of events publication process
 autostart=true
