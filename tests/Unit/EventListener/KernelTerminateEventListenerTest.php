@@ -66,7 +66,7 @@ class KernelTerminateEventListenerTest extends TestCase
 
         $event = new ConsoleTerminateEvent($command, $input, $output, 0);
 
-        $this->eventListener->onConsoleTerminateEvent($event);
+        $this->eventListener->onConsoleTerminate($event);
     }
 
     public function test_kernel_terminate_event_handler(): void
@@ -77,6 +77,6 @@ class KernelTerminateEventListenerTest extends TestCase
 
         $event = new TerminateEvent($kernel, $request, $response);
 
-        $this->eventListener->onTerminateEvent($event);
+        $this->eventListener->onTerminate($event);
     }
 }

@@ -38,12 +38,12 @@ class KernelTerminateEventListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public function onTerminateEvent(TerminateEvent $event): void
+    public function onTerminate(TerminateEvent $event): void
     {
         $this->publishEvents();
     }
 
-    public function onConsoleTerminateEvent(ConsoleTerminateEvent $event): void
+    public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
         $this->publishEvents();
     }
@@ -61,8 +61,8 @@ class KernelTerminateEventListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::TERMINATE => 'onTerminateEvent',
-            ConsoleEvents::TERMINATE => 'onConsoleTerminateEvent',
+            KernelEvents::TERMINATE => 'onTerminate',
+            ConsoleEvents::TERMINATE => 'onConsoleTerminate',
         ];
     }
 }
