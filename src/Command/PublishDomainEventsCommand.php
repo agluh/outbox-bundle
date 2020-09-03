@@ -87,6 +87,10 @@ class PublishDomainEventsCommand extends Command
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
         $io->success('Publishing domain events.');
 
+        if ($input->getOption('daemonize')) {
+            $io->comment('Ran as daemon');
+        }
+
         $last = array_pop($stopsWhen);
         $stopsWhen = ($stopsWhen ? implode(', ', $stopsWhen).' or ' : '').$last;
         $io->comment("The worker will automatically exit once it has {$stopsWhen}.");
@@ -95,10 +99,6 @@ class PublishDomainEventsCommand extends Command
 
         if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
             $io->comment('Re-run the command with a -vv option to see logs about published events.');
-        }
-
-        if ($input->getOption('daemonize')) {
-            $io->comment('Ran as daemon');
         }
 
         $options = [

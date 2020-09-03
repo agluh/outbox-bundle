@@ -4,13 +4,14 @@ Implements [Outbox pattern](https://microservices.io/patterns/data/transactional
 ## How it works:
 1. We collect domain events from aggregate being persisted and save them in a separate table within a single database transaction.
 2. After a successful commit we perform publication for stored domain events.
-    1. If bundle configured with `auto_publish=true` option, then domain events from outbox table are published using a Symfony event listener in the kernel.TERMINATE event.
+    1. If bundle configured with `auto_publish=true` option, then domain events from outbox table are published using a Symfony event listener in the kernel.TERMINATE or console.TERMINATE events.
     2. If bundle configured with `auto_publish=false` option, then you should use CLI interface described below to periodically run worker for publishing of stored events.
 
 **Important note:** events are published on-by-one in order they are stored in outbox table during aggregate persistence. 
 If for some reason during DomainEventEnqueuedForPublishingEvent handler domain event is not marked as published (i.e. publication date not set)
 then next time outbox will try to publish *the same domain event* until it succeeded. This ensures time consistency of published domain events.
 
+**Note:** you can combine auto publishing with CLI-based publication at the same time. Locking mechanism ensure all events will be published in order they came to outbox table.
 ### Acknowledgments
 Inspired by [Domain Event Bundle](https://github.com/headsnet/domain-events-bundle).
 Worker class manly based on Worker from symfony/messenger component.
@@ -179,13 +180,13 @@ Options:
 
 The php process is not designed to work for a long time. So it has to quit periodically. Or, the command may exit because of error or exception. Something has to bring it back and continue events publication (if not used auto publication). You can use Supervisord for that. It starts processes and keep an eye on them while they are working.
 
-Here an example of supervisord configuration. It runs an instance of outbox:publish command.
+Here an example of supervisord configuration.
 
 ```ini
 [program:outbox_worker]
 command=/path/to/bin/console --env=prod --no-debug --time-limit=3600 outbox:publish
 process_name=%(program_name)s_%(process_num)02d
-numprocs=1 # There is no reason to use multiple workers here because of the locking
+numprocs=1 # There is no reason to use multiple workers here because of locking nature of events publication process
 autostart=true
 autorestart=true
 startsecs=0
@@ -206,8 +207,8 @@ outbox:stop-workers
 
 ### Custom serializer
 
-By default, outbox bundle uses serialize/unserialize functions from PHP to convert storable domain event to a string.
-You can use custom serializer for that purpose. For example, how to use symfony/serializer is shown below.
+By default, outbox bundle uses serialize/unserialize functions from PHP to convert domain event to a string during persistence.
+You can use a custom serializer for that purpose. For example, how to use symfony/serializer is shown below.
 
 ```php
 namespace App\Service;
@@ -252,4 +253,15 @@ services:
 agluh_outbox:
     table_name: outbox      # Name of outbox table for Doctrine mapping
     auto_publish: false     # Publish domain events on kernel.TERMINATE or console.TERMINATE
+```
+
+### Contributing
+
+Contributions are welcome. Composer scripts are configured for your convenience:
+
+```
+> composer test       # Run test suite (you should set accessible MySQL server with DATABASE_URL env variable)
+> composer cs         # Run coding standards checks
+> composer cs-fix     # Fix coding standards violations
+> composer static     # Run static analysis with Phpstan
 ```

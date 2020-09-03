@@ -31,7 +31,7 @@ function bootstrap(): void
 
     $application->run(new ArrayInput([
         'command' => 'doctrine:query:sql',
-        'sql' => 'CREATE TABLE test (test VARCHAR(10))',
+        'sql' => 'CREATE TABLE outbox (id BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid_binary)\', event_data LONGTEXT NOT NULL, registered_at DATETIME(6) NOT NULL COMMENT \'(DC2Type:datetime_immutable_microseconds)\', to_be_published_at DATETIME(6) NOT NULL COMMENT \'(DC2Type:datetime_immutable_microseconds)\', published_at DATETIME(6) DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable_microseconds)\', PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB',
     ]));
 
     $kernel->shutdown();

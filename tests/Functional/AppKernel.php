@@ -6,18 +6,23 @@ namespace AGluh\Bundle\OutboxBundle\Tests\Functional;
 
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 class AppKernel extends Kernel
 {
+    /**
+     * @return array<mixed>
+     */
     public function registerBundles(): array
     {
         return [
             new FrameworkBundle(),
             new DoctrineBundle(),
             new DAMADoctrineTestBundle(),
+            new DoctrineFixturesBundle(),
         ];
     }
 

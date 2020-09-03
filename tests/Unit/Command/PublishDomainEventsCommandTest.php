@@ -34,6 +34,54 @@ class PublishDomainEventsCommandTest extends TestCase
         $tester->execute([]);
     }
 
+    public function test_run_with_options(): void
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock->expects(self::once())->method('acquire')->willReturn(true);
+
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory->expects(self::once())->method('createLock')->willReturn($lock);
+
+        $repository = $this->createMock(OutboxEventRepository::class);
+        $repository->expects(self::once())->method('getNextUnpublishedEvents')->willReturn([]);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+
+        $command = new PublishDomainEventsCommand(new EventDispatcher(), $lockFactory, $repository, $serializer);
+
+        $tester = new CommandTester($command);
+        $tester->execute([
+            '--limit' => 5,
+            '--time-limit' => 60,
+            '--memory-limit' => '20M',
+            '--sleep' => 5,
+        ]);
+    }
+
+    public function test_run_as_daemon(): void
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock->method('acquire')->willReturn(true);
+
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory->method('createLock')->willReturn($lock);
+
+        $repository = $this->createMock(OutboxEventRepository::class);
+        $repository->method('getNextUnpublishedEvents')->willReturn([]);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+
+        $command = new PublishDomainEventsCommand(new EventDispatcher(), $lockFactory, $repository, $serializer);
+
+        $tester = new CommandTester($command);
+        $tester->execute([
+            '--time-limit' => 5,
+            '--daemonize' => '1',
+        ]);
+
+        self::assertStringContainsString('Ran as daemon', $tester->getDisplay());
+    }
+
     /**
      * @dataProvider getBytesConversionTestData
      */
