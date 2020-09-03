@@ -1,17 +1,23 @@
 # Outbox bundle
+[![Build Status](https://travis-ci.com/agluh/outbox-bundle.svg?branch=master)](https://travis-ci.com/agluh/outbox-bundle)
+[![Latest Stable Version](https://poser.pugx.org/agluh/outbox-bundle/v)](//packagist.org/packages/agluh/outbox-bundle)
+[![Total Downloads](https://poser.pugx.org/agluh/outbox-bundle/downloads)](//packagist.org/packages/agluh/outbox-bundle)
+[![License](https://poser.pugx.org/agluh/outbox-bundle/license)](//packagist.org/packages/agluh/outbox-bundle)
+
+
 Implements [Outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) for DDD-based Symfony applications.
 
 ### How it works:
-1. We collect domain events from aggregate being persisted and save them in a separate table within a single database transaction.
-2. After a successful commit we perform publication for stored domain events.
-    1. If bundle configured with `auto_publish=true` option, then domain events from outbox table are published using a Symfony event listener in the kernel.TERMINATE or console.TERMINATE events.
-    2. If bundle configured with `auto_publish=false` option, then you should use CLI interface described below to periodically run worker for publishing of stored events.
+1. Bundle collects domain events from aggregate being persisted and save them in a separate table within a single database transaction.
+2. After a successful commit those domain events are enqueued for publication.
+    1. If bundle configured with `auto_publish=true` option, then domain events from outbox table will be processed using a Symfony event listener in the kernel.TERMINATE or console.TERMINATE events.
+    2. If bundle configured with `auto_publish=false` option, then you should use CLI interface described below to periodically run worker for processing of stored events.
 
-**Important note:** events are published on-by-one in order they are stored in outbox table during aggregate persistence. 
-If for some reason on _DomainEventEnqueuedForPublishingEvent_ handler domain event is not marked as published (i.e. publication date not set)
-then next time outbox will try to publish *the same domain event* until it succeeded. This ensures time consistency of published domain events.
+**Important note:** events are enqueued for publishing on-by-one in ascending order sorted by expected publication date (witch by default is date of registration domain event in outbox). 
+If for some reason on _DomainEventEnqueuedForPublishingEvent_ you did not marked domain event as published (i.e. publication date not set)
+then next time outbox will try to enqueue for publishing *the same domain event* until it succeeded. This ensures time consistency of published domain events.
 
-**Note:** you can combine auto publishing with CLI-based publication at the same time. Locking mechanism ensure all events will be published in order they came to outbox table.
+**Note:** you can combine auto publishing with CLI-based publication at the same time. Locking mechanism ensure all events will be published in the right order.
 
 ### Acknowledgments
 Inspired by [Domain Event Bundle](https://github.com/headsnet/domain-events-bundle).
