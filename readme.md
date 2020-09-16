@@ -21,7 +21,7 @@ then next time outbox will try to enqueue for publishing *the same domain event*
 
 ### Acknowledgments
 Inspired by [Domain Event Bundle](https://github.com/headsnet/domain-events-bundle).
-Worker class manly based on Worker from symfony/messenger component.
+Worker class mainly based on Worker from symfony/messenger component.
 
 ### Installation
 
